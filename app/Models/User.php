@@ -49,4 +49,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getPermissionArray()
+    {
+        return $this->getAllPermissions()->mapWithKeys(function($permission){
+            // mengubah data izin user menjadi array dengan format ["nama_izin" => true]
+            return [$permission['name'] => true];
+        });
+
+    }
 }
