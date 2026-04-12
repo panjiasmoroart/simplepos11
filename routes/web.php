@@ -10,7 +10,15 @@ use App\Http\Controllers\Auth\LogoutController;
 
 // Route::inertia('/home', 'Home');
 
-Route::redirect('/login', '/');
+// not working in laravel11
+// Route::redirect('/login', '/');
+
+// Root Route
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('admin.dashboard')
+        : redirect()->to('/login');
+});
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
