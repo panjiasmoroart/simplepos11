@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Admin\DashboardController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -31,3 +32,12 @@ Route::post('/logout', [LogoutController::class, '__invoke'])
     ->middleware('auth')
     ->name('logout');
 
+
+// Admin Routes
+Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+
+    Route::get('/dashboard', DashboardController::class)
+        // hanya pengguna dengan izin 'dashboard.index' yang dapat mengakses dashboard
+        ->middleware('permission:dashboard.index')
+        ->name('dashboard');
+});
