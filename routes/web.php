@@ -68,4 +68,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
                 $route->names($resource['names']);
             }
         }
+
+        // Utility Routes
+        Route::get('/get-cities/{provinceId}', [SupplierController::class, 'getCitiesByProvince'])
+            ->middleware('permission:suppliers.index')
+            ->name('get-cities');
 });
