@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -47,6 +48,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
                 'controller' => RoleController::class,
                 'permissions' => 'roles.index|roles.create|roles.edit|roles.delete',
                 'names' => 'roles'
+            ],
+            'users' => [
+                'controller' => UserController::class,
+                'permissions' => 'users.index|users.create|users.edit|users.delete',
+                'name' => 'users'
             ],
         ];
 
