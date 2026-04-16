@@ -69,6 +69,14 @@ const Sidebar = () => {
                 label="Customers"
               />
             )}
+
+            {hasAnyPermission(["categories.index"]) && (
+              <NavItem
+                href="/admin/categories"
+                icon="bi-list-ul"
+                label="Categories"
+              />
+            )}
           </ul>
         </div>
       </div>

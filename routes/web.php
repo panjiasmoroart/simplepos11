@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\CategoryController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -63,6 +64,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
             'customers' => [
                 'controller' => CustomerController::class,
                 'permissions' => 'customers.index|customers.create|customers.edit|customers.delete'
+            ],
+            'categories' => [
+                'controller' => CategoryController::class,
+                'permissions' => 'categories.index|categories.create|categories.edit|categories.delete',
+                'name' => 'categories'
             ],
         ];
 
