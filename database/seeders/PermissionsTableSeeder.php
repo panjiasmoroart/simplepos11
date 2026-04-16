@@ -22,7 +22,7 @@ class PermissionsTableSeeder extends Seeder
             'categories' => ['index', 'create', 'edit', 'delete'],
             'units' => ['index', 'create', 'edit', 'delete'],
             'products' => ['index', 'create', 'edit', 'delete'],
-            'stocks' => ['index', 'create'. 'delete'],
+            'stocks' => ['index', 'create', 'edit', 'delete'],
             'transactions' => ['index'],
             'reports' => ['index'],
             'stock-opnames' => ['index', 'create', 'edit','show'],
