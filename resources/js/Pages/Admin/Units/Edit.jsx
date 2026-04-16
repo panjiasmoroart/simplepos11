@@ -33,7 +33,7 @@ export default function UnitEdit() {
   return (
     <>
       <Head>
-        <title>Edit Unit - EasyPOS</title>
+        <title>Edit Unit - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="container-fluid">
