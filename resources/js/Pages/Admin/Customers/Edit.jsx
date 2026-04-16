@@ -35,7 +35,7 @@ export default function CustomerEdit({ customer }) {
   return (
     <>
       <Head>
-        <title>Edit Customer - EasyPOS</title>
+        <title>Edit Customer - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="container-fluid">
