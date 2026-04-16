@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\UnitController;
+use App\Http\Controllers\Admin\ProductController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -71,9 +73,14 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
                 'name' => 'categories'
             ],
             'units' => [
-                'controller' => \App\Http\Controllers\Admin\UnitController::class,
+                'controller' => UnitController::class,
                 'permissions' => 'units.index|units.create|units.edit|units.delete',
                 'name' => 'units'
+            ],
+            'products' => [
+                'controller' => ProductController::class,
+                'permissions' => 'products.index|products.create|products.edit|products.delete',
+                'name' => 'products'
             ],
         ];
 
