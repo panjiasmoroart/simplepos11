@@ -70,6 +70,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
                 'permissions' => 'categories.index|categories.create|categories.edit|categories.delete',
                 'name' => 'categories'
             ],
+            'units' => [
+                'controller' => \App\Http\Controllers\Admin\UnitController::class,
+                'permissions' => 'units.index|units.create|units.edit|units.delete',
+                'name' => 'units'
+            ],
         ];
 
         foreach ($resources as $name => $resource) {
