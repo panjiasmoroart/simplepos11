@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductStockController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -81,6 +82,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
                 'controller' => ProductController::class,
                 'permissions' => 'products.index|products.create|products.edit|products.delete',
                 'name' => 'products'
+            ],
+            'stocks' => [
+                'controller' => ProductStockController::class,
+                'permissions' => 'stocks.index|stocks.create|stocks.edit|stocks.delete',
+                'name' => 'stocks'
             ],
         ];
 

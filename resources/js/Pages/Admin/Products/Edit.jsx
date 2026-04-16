@@ -46,7 +46,7 @@ export default function ProductEdit() {
   return (
     <>
       <Head>
-        <title>Edit Product - EasyPOS</title>
+        <title>Edit Product - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="row mt-4">
