@@ -38,7 +38,7 @@ export default function UserIndex() {
   return (
     <>
       <Head>
-        <title>Users - EasyPOS</title>
+        <title>Users - SimplePOS</title>
       </Head>
       <AdminLayout>
         <nav aria-label="breadcrumb">

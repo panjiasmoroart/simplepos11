@@ -59,7 +59,7 @@ export default function SupplierCreate() {
   return (
     <>
       <Head>
-        <title>Create Supplier - EasyPOS</title>
+        <title>Create Supplier - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="container-fluid">

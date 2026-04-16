@@ -12,7 +12,7 @@ const Sidebar = () => {
       <div className="d-flex align-items-center p-3">
         <Link className="navbar-brand" href="/">
           <span className="navbar-brand-item h5 text-primary mb-0">
-            EasyPOS
+            SimplePOS
           </span>
         </Link>
       </div>

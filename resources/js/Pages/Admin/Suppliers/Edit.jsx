@@ -73,7 +73,7 @@ export default function SupplierEdit() {
   return (
     <>
       <Head>
-        <title>Edit Supplier - EasyPOS</title>
+        <title>Edit Supplier - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="container-fluid">

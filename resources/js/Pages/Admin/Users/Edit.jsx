@@ -51,7 +51,7 @@ export default function UserEdit() {
   return (
     <>
       <Head>
-        <title>Edit User - EasyPOS</title>
+        <title>Edit User - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="container mt-4">

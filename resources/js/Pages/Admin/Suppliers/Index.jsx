@@ -48,7 +48,7 @@ export default function SupplierIndex() {
   return (
     <>
       <Head>
-        <title>Suppliers - EasyPOS</title>
+        <title>Suppliers - SimplePOS</title>
       </Head>
       <AdminLayout>
         <nav aria-label="breadcrumb">

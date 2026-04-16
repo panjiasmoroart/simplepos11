@@ -44,7 +44,7 @@ export default function UserCreate() {
   return (
     <>
       <Head>
-        <title>Create User - EasyPOS</title>
+        <title>Create User - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="container mt-4">
