@@ -29,7 +29,7 @@ export default function CategoryEdit() {
   return (
     <>
       <Head>
-        <title>Edit Category - EasyPOS</title>
+        <title>Edit Category - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="d-flex justify-content-center mt-5">
