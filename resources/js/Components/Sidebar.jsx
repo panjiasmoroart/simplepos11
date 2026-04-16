@@ -61,6 +61,14 @@ const Sidebar = () => {
                 label="Suppliers"
               />
             )}
+
+            {hasAnyPermission(["customers.index"]) && (
+              <NavItem
+                href="/admin/customers"
+                icon="bi-people"
+                label="Customers"
+              />
+            )}
           </ul>
         </div>
       </div>

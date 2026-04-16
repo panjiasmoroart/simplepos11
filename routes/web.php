@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\CustomerController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -58,6 +59,10 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
             'suppliers' => [
                 'controller' => SupplierController::class,
                 'permissions' => 'suppliers.index|suppliers.create|suppliers.edit|suppliers.delete'
+            ],
+            'customers' => [
+                'controller' => CustomerController::class,
+                'permissions' => 'customers.index|customers.create|customers.edit|customers.delete'
             ],
         ];
 
