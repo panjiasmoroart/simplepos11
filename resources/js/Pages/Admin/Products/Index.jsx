@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Head, usePage, Link, router } from "@inertiajs/react";
 import Swal from "sweetalert2";
 import Barcode from "react-barcode";
@@ -15,6 +15,9 @@ export default function ProductIndex() {
       product.name &&
       product.name.toLowerCase().includes(filterText.toLowerCase()),
   );
+
+  // Menambahkan ref untuk setiap barcode
+  const barcodeRefs = useRef({});
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -122,13 +125,22 @@ export default function ProductIndex() {
                             </td>
                             <td>{product.name || "Nama tidak tersedia"}</td>
                             <td>
-                              <Barcode
-                                value={product.barcode}
-                                width={1}
-                                height={30}
-                                fontSize={12}
-                                displayValue={false}
-                              />
+                              <svg
+                                ref={(el) =>
+                                  (barcodeRefs.current[product.id] = el)
+                                }
+                              >
+                                <Barcode
+                                  value={product.barcode}
+                                  width={2}
+                                  height={90}
+                                  fontSize={16}
+                                  displayValue={true}
+                                  renderer="svg"
+                                  textAlign="center"
+                                  margin={10}
+                                />
+                              </svg>
                             </td>
                             <td>
                               {product.category.name || "Tidak ada kategori"}

@@ -9,7 +9,8 @@ const ProductCard = ({ product, onSelect }) => {
     >
       <img
         src={product.image}
-        className="card-img-top rounded-3"
+        className="card-img-top rounded-3 object-fit-cover w-100"
+        style={{ height: "200px" }}
         alt={product.name}
       />
       <div className="card-body d-flex flex-column p-2">
