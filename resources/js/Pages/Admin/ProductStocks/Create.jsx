@@ -68,7 +68,7 @@ export default function ProductStockCreate() {
   return (
     <>
       <Head>
-        <title>Add Product Stock - EasyPOS</title>
+        <title>Add Product Stock - SimplePOS</title>
       </Head>
       <AdminLayout>
         <div className="d-flex justify-content-center mt-5">

@@ -93,6 +93,12 @@ const Sidebar = () => {
                 label="Stock in"
               />
             )}
+
+            <li className="nav-item mt-3 mb-1 text-muted">Transactions</li>
+
+            {hasAnyPermission(["transactions.index"]) && (
+              <NavItem href="/admin/sales" icon="bi-cash" label="Sales" />
+            )}
           </ul>
         </div>
       </div>

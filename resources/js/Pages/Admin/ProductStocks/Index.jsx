@@ -49,7 +49,7 @@ export default function ProductStockIndex() {
   return (
     <>
       <Head>
-        <title>Stok Produk - EasyPOS</title>
+        <title>Stok Produk - SimplePOS</title>
       </Head>
       <AdminLayout>
         <nav aria-label="breadcrumb">

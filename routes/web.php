@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductStockController;
+use App\Http\Controllers\Admin\TransactionController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -98,8 +99,19 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
             }
         }
 
+        Route::prefix('sales')->name('sales.')->middleware('permission:transactions.index')->group(function () {
+            Route::get('/', [TransactionController::class, 'index'])->name('index');
+            Route::post('/add-product', [TransactionController::class, 'addProductToCart'])->name('add-product');
+            Route::delete('/delete-from-cart/{id}', [TransactionController::class, 'deleteFromCart'])->name('delete-from-cart');
+            Route::post('/process-payment', [TransactionController::class, 'processPayment'])->name('process-payment');
+            Route::post('/get-snap-token', [TransactionController::class, 'getSnapToken'])->name('get-snap-token');
+        });
+
         // Utility Routes
         Route::get('/get-cities/{provinceId}', [SupplierController::class, 'getCitiesByProvince'])
             ->middleware('permission:suppliers.index')
             ->name('get-cities');
+
+        Route::post('/get-courier-cost', [ProductStockController::class, 'getCourierCost'])->name('get-courier-cost')
+            ->middleware('permission:stocks.index');
 });
