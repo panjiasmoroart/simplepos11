@@ -60,7 +60,8 @@ const Sales = () => {
 
   // State lokal
   const [transactionSnapshot, setTransactionSnapshot] = useState(null);
-  const [showScanner, setShowScanner] = useState(false); // State untuk menampilkan scanner
+  // State untuk menampilkan scanner
+  const [showScanner, setShowScanner] = useState(false);
 
   /*
    |--------------------------------------------------------------------------
@@ -172,6 +173,10 @@ const Sales = () => {
     try {
       await router.post("/admin/sales/add-product", newItem, {
         onSuccess: (page) => {
+          if (page.props.errors?.quantity) {
+            return showAlert("Error!", page.props.errors.quantity, "error");
+          }
+
           // Update Keranjang Belanja di State
           dispatch(setCartItems(page.props.carts || []));
 
@@ -259,6 +264,15 @@ const Sales = () => {
     const discount = parseFloat(state.discount) || 0;
     const totalAmount = subTotal - discount;
 
+    // client side validation
+    // if (discount > subTotal) {
+    //   return showAlert(
+    //     "Error!",
+    //     "Diskon tidak boleh melebihi total belanja",
+    //     "error",
+    //   );
+    // }
+
     const cash =
       state.paymentMethod === "cash" ? parseFloat(state.cash) || 0 : null;
 
@@ -281,6 +295,7 @@ const Sales = () => {
     setTransactionSnapshot(snapshot);
 
     const transactionData = {
+      // subTotal: subTotal,
       customer_id: state.selectedCustomer || null,
       total_amount: totalAmount,
       cash: cash,
@@ -360,8 +375,41 @@ const Sales = () => {
             dispatch(setQuantity(1));
           }
         },
-        onError: () =>
-          showAlert("Error!", "Failed to process payment.", "error"),
+        onError: (errors) => {
+          // console.log("Payment processing error:", errors);
+
+          // error from server validation
+          if (errors.cart) {
+            return showAlert("Error! Cart", errors.cart, "error");
+          }
+
+          // error from server validation
+          if (errors.discount) {
+            return showAlert("Error! Discount", errors.discount, "error");
+          }
+
+          // error from server validation
+          if (errors.quantity) {
+            setTimeout(() => {
+              Swal.fire({
+                title: "Error! Quantity",
+                text: errors.quantity,
+                icon: "error",
+              });
+            }, 20);
+
+            // tidak bisa langsung showAlert karena re-render Inertia yang cepat,
+            // jadi kita set state dulu baru useEffect yang pantau state itu yang showAlert
+
+            // const qtyErrorKey = Object.keys(errors).find((key) =>
+            //   key.includes("quantity"),
+            // );
+            // return showAlert("Error!", errors[qtyErrorKey], "error");
+            // return showAlert("Error! Quantity", errors.quantity, "error");
+          }
+
+          // showAlert("Error!", "Failed to process payment.", "error");
+        },
       });
     } catch {
       showAlert(

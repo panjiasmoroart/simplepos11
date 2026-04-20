@@ -8,3 +8,10 @@ class Supplier extends Model
 {
     protected $guarded = [];
 }
+
+
+/*
+CREATE INDEX idx_suppliers_name ON suppliers(name);
+CREATE INDEX idx_suppliers_phone ON suppliers(phone);
+CREATE INDEX idx_suppliers_status ON suppliers(status);
+*/

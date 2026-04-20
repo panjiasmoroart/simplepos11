@@ -1,0 +1,17 @@
+ // import debounce from "lodash/debounce";
+
+ // debounce search (penting buat performa)
+  // const debouncedSearch = debounce((value, status, perPage) => {
+  //   router.get(
+  //     "/admin/suppliers",
+  //     {
+  //       q: value,
+  //       status: status,
+  //       per_page: perPage,
+  //     },
+  //     {
+  //       preserveState: true,
+  //       replace: true,
+  //     },
+  //   );
+  // }, 400);

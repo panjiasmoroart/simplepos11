@@ -15,7 +15,7 @@ class SupplierController extends Controller
     /**
      * Tampilkan daftar semua supplier.
      */
-    public function index()
+    public function indexOld()
     {
         // Ambil data supplier dengan fitur pencarian berdasarkan nama jika ada query 'q'
         $suppliers = Supplier::when(request()->q, function($suppliers) {
@@ -28,6 +28,42 @@ class SupplierController extends Controller
         // Kembalikan data ke komponen Inertia 'Admin/Suppliers/Index'
         return inertia('Admin/Suppliers/Index', [
             'suppliers' => $suppliers
+        ]);
+    }
+
+    public function index(Request $request)
+    {
+        $query = Supplier::query()
+            ->select(['id', 'name', 'phone', 'address', 'status', 'created_at']);
+
+        // Search (INDEX FRIENDLY)
+        if ($request->filled('q')) {
+            $search = $request->q;
+
+            // prefix (indexable)
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', $search . '%')
+                ->orWhere('phone', 'like', $search . '%');
+            });
+        }
+
+        // Filter status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Pagination (dynamic)
+        // max 100 (safety)
+        $perPage = min($request->get('per_page', 10), 100);
+
+        $suppliers = $query
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return inertia('Admin/Suppliers/Index', [
+            'suppliers' => $suppliers,
+            'filters' => $request->only(['q', 'status', 'per_page'])
         ]);
     }
 
