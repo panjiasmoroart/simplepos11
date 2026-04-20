@@ -232,66 +232,74 @@ class TransactionController extends Controller
         //     ['product_id' => 5, 'quantity' => 1],
         // ];
 
-        // Gunakan DB transaction untuk memastikan data konsisten
-        DB::transaction(function () use ($carts, $validated, $userId, $totalAmount, &$snapToken) {
-            // create transaction
-            $transaction = Transaction::create([
-                'customer_id' => $validated['customer_id'],
-                'user_id' => $userId,
-                'total_amount' => $totalAmount,
-                'cash' => $validated['payment_method'] === 'cash' ? $validated['cash'] : null,
-                'change' => $validated['payment_method'] === 'cash' ? $validated['change'] : null,
-                'discount' => $validated['discount'] ?? 0,
-                'payment_method' => $validated['payment_method'],
-                'status' => $validated['payment_method'] === 'online' ? 'pending' : 'success',
-            ]);
+        try {
+            // Gunakan DB transaction untuk memastikan data konsisten
+            DB::transaction(function () use ($carts, $validated, $userId, $totalAmount, &$snapToken) {
+                // create transaction
+                $transaction = Transaction::create([
+                    'customer_id' => $validated['customer_id'],
+                    'user_id' => $userId,
+                    'total_amount' => $totalAmount,
+                    'cash' => $validated['payment_method'] === 'cash' ? $validated['cash'] : null,
+                    'change' => $validated['payment_method'] === 'cash' ? $validated['change'] : null,
+                    'discount' => $validated['discount'] ?? 0,
+                    'payment_method' => $validated['payment_method'],
+                    'status' => $validated['payment_method'] === 'online' ? 'pending' : 'success',
+                ]);
 
-            foreach ($carts as $cart) {
-                // lock per row (hindari race condition)
-                $stock = StockTotal::where('product_id', $cart->product_id)
-                    ->lockForUpdate()
-                    ->first();
+                foreach ($carts as $cart) {
+                    // lock per row (hindari race condition)
+                    $stock = StockTotal::where('product_id', $cart->product_id)
+                        ->lockForUpdate()
+                        ->first();
 
-                if (!$stock || $stock->total_stock < $cart->quantity) {
-                    return redirect()->back()->withErrors([
-                        'quantity' => "Stok produk untuk {$cart->product->name} tidak mencukupi . Stok saat ini: "
-                            . ($stock->total_stock ?? 0)
+                    if (!$stock || $stock->total_stock < $cart->quantity) {
+                        if (!$stock || $stock->total_stock < $cart->quantity) {
+                            throw new \Exception(
+                                "Stok produk untuk {$cart->product->name} tidak mencukupi. Stok saat ini: "
+                                . ($stock->total_stock ?? 0)
+                            );
+                        }
+                    }
+
+                    // kurangi stock (atomic)
+                    $stock->decrement('total_stock', $cart->quantity);
+
+                    // simpan detail transaksi
+                    $transaction->transactionDetails()->create([
+                        'product_id' => $cart->product_id,
+                        'product_name' => $cart->product->name,
+                        'quantity' => $cart->quantity,
+                        'subtotal' => $cart->quantity * $cart->product->selling_price,
                     ]);
                 }
 
-                // kurangi stock (atomic)
-                $stock->decrement('total_stock', $cart->quantity);
+                // jika ada customer_id / kasir input pembeli
+                if ($validated['customer_id']) {
+                    Cart::where('user_id', $userId)
+                        ->whereNull('customer_id')
+                        ->update(['customer_id' => $validated['customer_id']]);
 
-                // simpan detail transaksi
-                $transaction->transactionDetails()->create([
-                    'product_id' => $cart->product_id,
-                    'product_name' => $cart->product->name,
-                    'quantity' => $cart->quantity,
-                    'subtotal' => $cart->quantity * $cart->product->selling_price,
-                ]);
-            }
+                    Cart::where('customer_id', $validated['customer_id'])
+                        ->where('user_id', $userId)
+                        ->delete();
+                } else {
+                    Cart::where('user_id', $userId)->delete();
+                }
 
-            // jika ada customer_id / kasir input pembeli
-            if ($validated['customer_id']) {
-                Cart::where('user_id', $userId)
-                    ->whereNull('customer_id')
-                    ->update(['customer_id' => $validated['customer_id']]);
+                // Jika online, buat transaksi Midtrans dan dapatkan Snap Token
+                if ($validated['payment_method'] === 'online') {
+                    $snapToken = $this->createMidtransTransaction($transaction);
+                }
+            });
 
-                Cart::where('customer_id', $validated['customer_id'])
-                    ->where('user_id', $userId)
-                    ->delete();
-            } else {
-                Cart::where('user_id', $userId)->delete();
-            }
+            return redirect()->route('admin.sales.index');
 
-            // Jika online, buat transaksi Midtrans dan dapatkan Snap Token
-            if ($validated['payment_method'] === 'online') {
-                $snapToken = $this->createMidtransTransaction($transaction);
-            }
-        });
-
-
-        return redirect()->route('admin.sales.index');
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'quantity' => $e->getMessage()
+            ]);
+        }
     }
 
 
