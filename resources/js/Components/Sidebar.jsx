@@ -99,6 +99,16 @@ const Sidebar = () => {
             {hasAnyPermission(["transactions.index"]) && (
               <NavItem href="/admin/sales" icon="bi-cash" label="Sales" />
             )}
+
+            <li className="nav-item mt-3 mb-1 text-muted">Reports</li>
+
+            {hasAnyPermission(["reports.index"]) && (
+              <NavItem
+                href="/admin/report"
+                icon="bi-clipboard-data"
+                label="Reports"
+              />
+            )}
           </ul>
         </div>
       </div>

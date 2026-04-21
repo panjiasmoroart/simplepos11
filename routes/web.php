@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductStockController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\ReportController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -105,6 +106,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
             Route::delete('/delete-from-cart/{id}', [TransactionController::class, 'deleteFromCart'])->name('delete-from-cart');
             Route::post('/process-payment', [TransactionController::class, 'processPayment'])->name('process-payment');
             Route::post('/get-snap-token', [TransactionController::class, 'getSnapToken'])->name('get-snap-token');
+        });
+
+        Route::prefix('report')->name('report.')->middleware('permission:reports.index')->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('/generate', [ReportController::class, 'generate'])->name('generate');
         });
 
         // Utility Routes
