@@ -26,6 +26,7 @@ class TransactionController extends Controller
     {
         $userId = Auth::id();
 
+        // Tangkap data callback dari Midtrans setelah pembayaran selesai
         $orderId = $request->input('order_id');
         $statusCode = $request->input('status_code');
         $transactionStatus = $request->input('transaction_status');
@@ -293,6 +294,10 @@ class TransactionController extends Controller
                 }
             });
 
+            if ($validated['payment_method'] === 'online') {
+                return redirect()->route('admin.sales.index', ['payment_link_url' => $snapToken]);
+            }
+
             return redirect()->route('admin.sales.index');
 
         } catch (\Exception $e) {
@@ -303,11 +308,60 @@ class TransactionController extends Controller
     }
 
 
-     /**
-     * Membuat Snap Token dari Midtrans.
-     */
+    /**
+    * Membuat Snap Token dari Midtrans.
+    */
     protected function createMidtransTransaction($transaction)
     {
+        Config::$serverKey = config('services.midtrans.server_key');
+        Config::$isProduction = config('services.midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $amountAfterDiscount = $transaction->total_amount - $transaction->discount;
+
+        $finalAmount = max(0, $amountAfterDiscount);
+
+        // menyiapkan parameter transaksi yang akan dikirim ke Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => $transaction->invoice,
+                'gross_amount' => $finalAmount,
+            ],
+            'customer_details' => [
+                'first_name' => $transaction->customer->name ?? 'Guest',
+                'email' => $transaction->customer->email ?? 'guest@example.com',
+            ],
+            'item_details' => $transaction->transactionDetails->map(function ($detail) {
+                return [
+                    'id' => $detail->product_id,
+                    'price' => $detail->subtotal / $detail->quantity,
+                    'quantity' => $detail->quantity,
+                    'name' => $detail->product_name,
+                ];
+            })->toArray(),
+        ];
+
+        if ($transaction->discount > 0) {
+            $params['item_details'][] = [
+                'id' => 'DISCOUNT',
+                'price' => -$transaction->discount,
+                'quantity' => 1,
+                'name' => 'Discount',
+            ];
+        }
+
+        $params['callbacks'] = [
+            'finish' => route('admin.sales.index'),
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+        // setelah snapToken diterima update ke transacation db, untuk simpan payment_link_url
+        $transaction->update(['payment_link_url' => $snapToken]);
+
+        // lalu kita return snapToken agar bisa digunakan di frontend
+        // untuk memulai proses pembayaran dengan Midtrans
+        return $snapToken;
     }
 
      /**

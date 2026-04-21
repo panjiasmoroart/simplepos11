@@ -26,6 +26,8 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="64x64" href="{{ asset('favicon.png') }}">
 
   @viteReactRefresh
   @vite('resources/js/app.jsx')
