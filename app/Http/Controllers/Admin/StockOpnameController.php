@@ -193,7 +193,7 @@ class StockOpnameController extends Controller
     /**
      * Update data stock opname di database.
      */
-    public function update(StockOpnameRequest $request, StockOpname $stockOpname)
+    public function updateOld(StockOpnameRequest $request, StockOpname $stockOpname)
     {
         // Validasi input
         $validatedData = $request->validated();
@@ -234,6 +234,83 @@ class StockOpnameController extends Controller
         }
 
         // Kembali ke daftar stock opname
+        return redirect()->route('admin.stock-opnames.index');
+    }
+
+    public function update(StockOpnameRequest $request, StockOpname $stockOpname)
+    {
+        $validatedData = $request->validated();
+
+        $opnameDate = Carbon::parse($validatedData['opname_date'])->format('Y-m-d');
+
+        $productIds = collect($validatedData['products'])
+            ->pluck('product_id')
+            ->unique();
+
+        $stockTotals = StockTotal::whereIn('product_id', $productIds)
+            ->get()
+            ->keyBy('product_id');
+
+        $errors = [];
+        $detailsToInsert = [];
+
+        try {
+            DB::transaction(function () use (
+                $stockOpname,
+                $validatedData,
+                $opnameDate,
+                $stockTotals,
+                &$errors,
+                &$detailsToInsert
+            ) {
+                // Update header
+                $stockOpname->update([
+                    'opname_date' => $opnameDate,
+                    'status' => $validatedData['status'],
+                ]);
+
+                foreach ($validatedData['products'] as $index => $productData) {
+                    $productId = $productData['product_id'];
+                    $stockTotal = $stockTotals[$productId] ?? null;
+
+                    if (!$stockTotal) {
+                        $errors["products.$index.product_id"] =
+                            "Stok untuk product ID {$productId} tidak ditemukan.";
+                        continue;
+                    }
+
+                    $detailsToInsert[] = [
+                        'stock_opname_id'     => $stockOpname->id,
+                        'product_id'          => $productId,
+                        'stock_total_id'      => $stockTotal->id,
+                        'physical_quantity'   => $productData['physical_quantity'],
+                        'quantity_difference' => $productData['physical_quantity'] - $stockTotal->total_stock,
+                        'created_at'          => now(),
+                        'updated_at'          => now(),
+                    ];
+                }
+
+                if (!empty($errors)) {
+                    throw ValidationException::withMessages($errors);
+                }
+
+                // Hapus DetailsOpname lama
+                $stockOpname->details()->delete();
+
+                // Bulk insert
+                collect($detailsToInsert)->chunk(1000)->each(function ($chunk) {
+                    StockOpnameDetail::insert($chunk->toArray());
+                });
+            });
+
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => 'Terjadi kesalahan pada server.'
+            ]);
+        }
+
         return redirect()->route('admin.stock-opnames.index');
     }
 
