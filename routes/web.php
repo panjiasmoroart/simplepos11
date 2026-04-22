@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductStockController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\StockOpnameController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -90,6 +91,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
                 'permissions' => 'stocks.index|stocks.create|stocks.edit|stocks.delete',
                 'name' => 'stocks'
             ],
+            'stock-opnames' => [
+                'controller' => StockOpnameController::class,
+                'permissions' => 'stock-opnames.index|stock-opnames.create|stock-opnames.edit|stock-opnames.show',
+                'name' => 'stock-opnames'
+            ],
         ];
 
         foreach ($resources as $name => $resource) {
@@ -112,6 +118,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/generate', [ReportController::class, 'generate'])->name('generate');
         });
+
+        Route::get('/stock-opnames/{id}/export', [StockOpnameController::class, 'export'])
+            ->name('stock-opnames.export');
 
         // Utility Routes
         Route::get('/get-cities/{provinceId}', [SupplierController::class, 'getCitiesByProvince'])

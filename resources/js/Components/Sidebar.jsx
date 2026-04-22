@@ -109,6 +109,14 @@ const Sidebar = () => {
                 label="Reports"
               />
             )}
+
+            {hasAnyPermission(["stock-opnames.index"]) && (
+              <NavItem
+                href="/admin/stock-opnames"
+                icon="bi-journal-check"
+                label="Stock Opnames"
+              />
+            )}
           </ul>
         </div>
       </div>
