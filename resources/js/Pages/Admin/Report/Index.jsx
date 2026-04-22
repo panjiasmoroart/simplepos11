@@ -38,7 +38,7 @@ export default function ReportIndex() {
   return (
     <>
       <Head>
-        <title>Transaction Report - EasyPOS</title>
+        <title>Transaction Report - SimplePOS</title>
       </Head>
 
       <AdminLayout>

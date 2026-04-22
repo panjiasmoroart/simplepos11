@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StockOpnameRequest;
 use App\Models\StockOpname;
+use App\Models\StockOpnameDetail;
 use App\Models\Product;
 use App\Models\StockTotal;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class StockOpnameController extends Controller
 {
@@ -45,6 +47,88 @@ class StockOpnameController extends Controller
      * Simpan stock opname baru ke database.
      */
     public function store(StockOpnameRequest $request)
+    {
+        // Validasi data input melalui StockOpnameRequest
+        $validatedData = $request->validated();
+
+        // Ubah format tanggal ke 'Y-m-d'
+        $opnameDate = Carbon::parse($validatedData['opname_date'])->format('Y-m-d');
+
+        // Ambil semua product_id
+        $productIds = collect($validatedData['products'])
+            ->pluck('product_id')
+            ->unique()
+            ->values();
+
+        // Ambil semua stock_total
+        $stockTotals = StockTotal::whereIn('product_id', $productIds)
+            ->get()
+            ->keyBy('product_id');
+
+         // Ambil semua product (untuk error message)
+        $products = Product::whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
+        $detailsToInsert = [];
+        $errors = [];
+
+        try {
+             DB::transaction(function () use ($validatedData, $products,  $stockTotals, $opnameDate, &$detailsToInsert, &$errors) {
+                // Buat record StockOpname (header)
+                $stockOpname = StockOpname::create([
+                    'opname_date' => $opnameDate,
+                    'status' => 'pending',
+                ]);
+
+                foreach ($validatedData['products'] as $index => $productData) {
+                    $productId = $productData['product_id'];
+                    $stockTotal = $stockTotals[$productId] ?? null;
+
+                    if (!$stockTotal) {
+                        $productName = $products[$productId]->name ?? 'Produk Tidak Ditemukan';
+                        $errors["products.$index.product_id"] =
+                            "Stok untuk produk \"{$productName}\" tidak ditemukan.";
+                        continue;
+                    }
+
+                    $quantityDifference = $productData['physical_quantity'] - $stockTotal->total_stock;
+
+                    $detailsToInsert[] = [
+                        'stock_opname_id'     => $stockOpname->id,
+                        'product_id'          => $productId,
+                        'stock_total_id'      => $stockTotal->id,
+                        'physical_quantity'   => $productData['physical_quantity'],
+                        'quantity_difference' => $quantityDifference,
+                        'created_at'          => now(),
+                        'updated_at'          => now(),
+                    ];
+                }
+
+                if (!empty($errors)) {
+                    throw ValidationException::withMessages($errors);
+                }
+
+                // bulk insert
+                // StockOpnameDetail::insert($detailsToInsert);
+                collect($detailsToInsert)->chunk(1000)->each(function ($chunk) {
+                    StockOpnameDetail::insert($chunk->toArray());
+                });
+             });
+        } catch (ValidationException $e) {
+             // agar inertia dapet format asli
+            throw $e;
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => 'Terjadi kesalahan pada server.'
+            ]);
+        }
+
+        // Kembali ke daftar stock opname
+        return redirect()->route('admin.stock-opnames.index');
+    }
+
+    public function storeOld(StockOpnameRequest $request)
     {
         // Validasi data input melalui StockOpnameRequest
         $validatedData = $request->validated();

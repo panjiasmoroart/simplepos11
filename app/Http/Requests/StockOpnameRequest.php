@@ -26,7 +26,22 @@ class StockOpnameRequest extends FormRequest
             'status' => 'required|string|in:pending,completed,canceled',
             'products' => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
+            // 'products.*.product_id' => 'required|integer',
             'products.*.physical_quantity' => 'required|integer|min:0',
         ];
+
+        // $isTesting = app()->environment('local');
+
+        // return [
+        //     'opname_date' => 'required|date',
+        //     'status' => 'required|string|in:pending,completed,canceled',
+        //     'products' => 'required|array|min:1',
+
+        //     'products.*.product_id' => $isTesting
+        //         ? 'required|integer'
+        //         : 'required|exists:products,id',
+
+        //     'products.*.physical_quantity' => 'required|integer|min:0',
+        // ];
     }
 }

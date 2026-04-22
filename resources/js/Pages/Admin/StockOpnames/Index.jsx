@@ -34,7 +34,7 @@ export default function StockOpnameIndex() {
   return (
     <>
       <Head>
-        <title>Stock Opnames - EasyPOS</title>
+        <title>Stock Opnames - SimplePOS</title>
       </Head>
       <AdminLayout>
         {/* Breadcrumb */}
