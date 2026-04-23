@@ -319,6 +319,13 @@ class StockOpnameController extends Controller
      */
     public function show(StockOpname $stockOpname)
     {
+        // eager loading relasi setelah model sudah diambil dari database.
+        // nested relationship:
+
+        // details → relasi dari StockOpname ke StockOpnameDetail
+        // product → relasi dari StockOpnameDetail ke Product
+        // stockTotal → relasi dari StockOpnameDetail ke StockTotal
+
         // Muat detail produk dan stok total yang terkait
         $stockOpname->load('details.product', 'details.stockTotal');
 
