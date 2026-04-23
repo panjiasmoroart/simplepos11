@@ -60,6 +60,18 @@ const ShowStockOpname = () => {
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
               />
+
+              <div>
+                {/* Tombol Export */}
+                <a
+                  href={`/admin/stock-opnames/${stockOpname.id}/export`}
+                  className="btn btn-secondary"
+                >
+                  <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                  Export to Excel
+                </a>
+              </div>
+
               <Link href="/admin/stock-opnames" className="btn btn-primary">
                 Back to Stock Opnames
               </Link>
