@@ -25,7 +25,7 @@ use App\Http\Controllers\Admin\StockOpnameController;
 // not working in laravel11
 // Route::redirect('/login', '/');
 
-// Root Route
+// Root Route, Fixing To Many Requests
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('admin.dashboard')
